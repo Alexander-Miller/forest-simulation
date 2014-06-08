@@ -107,7 +107,7 @@ public class Forest {
 			}
 		} else if (percentage > 0.5) {
 			//Hire 20% more:
-			int max = LOGGER.lumberjacks * 5;
+			int max = LOGGER.lumberjacks / 5;
 			for (int i = 0; i < max; i++) {
 				newSpawn(LumberJack.class, f -> !f.bearPresent() && !f.lumberJackPresent());
 				LOGGER.updateLumberJacksHired(1);
