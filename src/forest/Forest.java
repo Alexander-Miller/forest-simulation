@@ -18,7 +18,7 @@ public class Forest {
 	
 	private int time = 0;
 		
-	Forest(int size) {
+	public Forest(int size) {
 		this.SIZE = size;
 		FIELDS = new Field[size][size];
 		FIELD_LST = new ArrayList<>();
@@ -39,9 +39,9 @@ public class Forest {
 	}
 	
 	private void fillForest() {                 
-		fill(0.1, LumberJack.class, x -> LOGGER.updateLumberJacks(x));
+		fill(0.02, LumberJack.class, x -> LOGGER.updateLumberJacks(x));
 		fill(0.5, AdultTree.class, x -> LOGGER.updateAdultTrees(x));
-		fill(0.02, Bear.class, x -> LOGGER.updateBears(x));
+		fill(0.01, Bear.class, x -> LOGGER.updateBears(x));
 	}
 	
 	private void fill(double percent, Class<? extends ForestElement> type, IntConsumer counter) {
@@ -62,7 +62,6 @@ public class Forest {
 		}
 	}
 	
-
 	@Override
 	public String toString() {
 		StringBuilder b = new StringBuilder();
@@ -90,27 +89,28 @@ public class Forest {
 	private void log() {
 		LOGGER.monthlyLog(time);
 		if (time % 12 == 0) LOGGER.yearlyLog(time / 12);
-		System.out.println(this);
 	}	
 	
 	private void lumberQuotaCheck() {
-		if (LOGGER.lumberjacks > 1 && LOGGER.yearlyWood < LOGGER.lumberjacks) {
-			for (int i = LOGGER.lumberjacks - LOGGER.yearlyWood; i > 0 && LOGGER.lumberjacks > 1; i--) {
+		double numTrees = (double) FIELD_LST.stream()
+			.filter(field -> field.treePresent())
+			.count();
+		double percentage = numTrees / (SIZE * SIZE);
+		if (percentage < 0.33) {
+			//Fire 20%:
+			int max = LOGGER.lumberjacks / 5;
+			for (int i = 0; i < max; i++) {
 				getRandom(f -> f.lumberJackPresent()).ifPresent(field -> {
 					field.leaveLumberJack();
 					LOGGER.updateLumberJacksHired(-1);
-					LOGGER.updateLumberJacks(-1);
 				});
 			}
-		} else if (LOGGER.yearlyWood > LOGGER.lumberjacks) {
-			int newHires = 1;
-			while (LOGGER.yearlyWood > LOGGER.lumberjacks * (newHires + 1)- 1) {
-				newHires++;
-			}
-			for (int i = 0; i < newHires; i++) {
+		} else if (percentage > 0.5) {
+			//Hire 20% more:
+			int max = LOGGER.lumberjacks * 5;
+			for (int i = 0; i < max; i++) {
 				newSpawn(LumberJack.class, f -> !f.bearPresent() && !f.lumberJackPresent());
 				LOGGER.updateLumberJacksHired(1);
-				LOGGER.updateLumberJacks(1);
 			}
 		}
 	}
@@ -163,19 +163,16 @@ public class Forest {
 				Optional<Field> saplingField = tree.update(neighbours);
 				saplingField.ifPresent(f -> { 
 					f.occupyTree(new Sapling());
-					LOGGER.updateSaplingTrees(1);
 					LOGGER.updateMonthlySaplings(1);
 				});
 
 				if (tree.getAge() == 12) {
 					field.occupyTree(new AdultTree());
 					LOGGER.updateSaplingTrees(-1);
-					LOGGER.updateAdultTrees(1);
 					LOGGER.updateMonthlyAdults(1);
 				} else if (tree.getAge() == 120) {
 					field.occupyTree(new ElderTree());
 					LOGGER.updateAdultTrees(-1);
-					LOGGER.updateElderTrees(1);
 					LOGGER.updateMonthlyElders(1);
 				}
 			}
@@ -219,11 +216,9 @@ public class Forest {
 					if (field.lumberJackPresent()) {
 						field.leaveLumberJack();
 						LOGGER.updateMonthlyMawings(1);
-						LOGGER.updateLumberJacks(-1);
 						if (LOGGER.lumberjacks == 0) {
 							newSpawn(LumberJack.class, f -> !f.bearPresent() && ! f.lumberJackPresent());
 							LOGGER.updateLumberJacksHired(1);
-							LOGGER.updateLumberJacks(1);
 						}
 						break wandering;
 					} else  {
@@ -253,17 +248,21 @@ public class Forest {
 			.map(p -> FIELDS[p.x][p.y])
 			.collect(Collectors.toList());
 	}
-	
-	public void go(int x) {
-		for (int i = 0; i < x; i++) {
-			tick();
-		}
+		
+	public int getSize() {
+		return SIZE;
 	}
 	
-	public static void main(String[] args) {
-		Forest forest = new Forest(20);
-		System.out.println(forest);
-		forest.go(500);
+	public int getTime() {
+		return time;
+	}
+	
+	public Field[][] getFields() {
+		return FIELDS;
+	}
+	
+	public Logger getLogger() {
+		return LOGGER;
 	}
 	
 }

@@ -1,26 +1,26 @@
 package forest;
 
 public class Logger {	
-	int monthlyWood      = 0;
-	int monthlyMawings   = 0;
-	int monthlySaplings  = 0;
-	int monthlyAdults    = 0;
-	int monthlyElders    = 0;
+	public int monthlyWood      = 0;
+	public int monthlyMawings   = 0;
+	public int monthlySaplings  = 0;
+	public int monthlyAdults    = 0;
+	public int monthlyElders    = 0;
 	
-	int yearlyWood       = 0;
-	int yearlyMawings    = 0;
-	int yearlySaplings   = 0;
-	int yearlyAdults     = 0;
-	int yearlyElders     = 0;
+	public int yearlyWood       = 0;
+	public int yearlyMawings    = 0;
+	public int yearlySaplings   = 0;
+	public int yearlyAdults     = 0;
+	public int yearlyElders     = 0;
 	
-	int lumberJacksHired = 0;
-	int bearsCaught      = 0;
+	public int lumberJacksHired = 0;
+	public int bearsCaught      = 0;
 	
-	int saplings         = 0;
-	int adults           = 0;
-	int elders           = 0;
-	int bears            = 0;
-	int lumberjacks      = 0;
+	public int saplings         = 0;
+	public int adults           = 0;
+	public int elders           = 0;
+	public int bears            = 0;
+	public int lumberjacks      = 0;
 	
 	void updateMonthlyWood(int x) {
 		monthlyWood += x;
@@ -30,29 +30,35 @@ public class Logger {
 	void updateMonthlyMawings(int x) {
 		monthlyMawings += x;
 		yearlyMawings += x;
+		lumberjacks -= x;
 	}
 	
 	void updateMonthlySaplings(int x) {
 		monthlySaplings += x;
 		yearlySaplings += x;
+		saplings += x;
 	}
 	
 	void updateMonthlyAdults(int x) {
 		monthlyAdults += x;
 		yearlyAdults += x;
+		adults += x;
 	}
 	
 	void updateMonthlyElders(int x) {
 		monthlyElders += x;
 		yearlyElders += x;
+		elders += x;
 	}
 	
 	void updateLumberJacksHired(int x) {
 		lumberJacksHired += x;
+		lumberjacks += x;
 	}
 	
 	void updateBearsCaught(int x) {
 		bearsCaught += x;
+		bears += x;
 	}
 	
 	void updateLumberJacks(int x) {
@@ -160,9 +166,9 @@ public class Logger {
 		}
 		if (lumberJacksHired > 0) {
 			if (lumberJacksHired > 1) {
-				System.out.println(y + lumberJacksHired + " were hired.");
+				System.out.println(y + lumberJacksHired + "Lumberjacks were hired.");
 			} else {
-				System.out.println(y + lumberJacksHired + " was hired.");
+				System.out.println(y + lumberJacksHired + "Lumberjack was hired.");
 			}
 		} else if (lumberJacksHired < 0) {
 			System.out.println(y + "1 Lumberjack was let go.");
